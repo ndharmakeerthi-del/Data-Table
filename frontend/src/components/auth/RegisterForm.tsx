@@ -5,10 +5,10 @@ import { Eye, EyeOff, UserPlus, User, Lock } from 'lucide-react';
 import { RegisterSchema, RegisterFormData } from '@/schemas';
 import { useRegister } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Form } from '@/components/ui/form';
+import { FormInput } from '../customUi/formInput';
+import { FormSelect } from '../customUi/customSelect';
 
 interface RegisterFormProps {
     onBackToLogin: () => void;
@@ -30,6 +30,11 @@ export function RegisterForm({ onBackToLogin }: RegisterFormProps) {
             confirmPassword: '',
         },
     });
+
+
+    if (registerMutation.isSuccess) {
+        onBackToLogin();
+    }
 
     const onSubmit = (data: RegisterFormData) => {
         registerMutation.mutate(data);
@@ -54,166 +59,105 @@ export function RegisterForm({ onBackToLogin }: RegisterFormProps) {
 
                 <CardContent className="space-y-6">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                             <div className="grid grid-cols-2 gap-4">
-                                <FormField
+                                <FormInput
                                     control={form.control}
                                     name="firstName"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-sm font-medium">First Name</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    type="text"
-                                                    placeholder="John"
-                                                    className="h-10 border-border/50 focus:border-primary transition-colors"
-                                                    disabled={registerMutation.isPending}
-                                                />
-                                            </FormControl>
-                                            <FormMessage className="text-xs" />
-                                        </FormItem>
-                                    )}
+                                    label="First Name"
+                                    type="text"
+                                    placeholder="John"
+                                    className="h-10 border-border/50 focus:border-primary transition-colors"
+                                    disabled={registerMutation.isPending}
+                                    leftIcon={<User className="w-4 h-4 text-muted-foreground" />}
                                 />
 
-                                <FormField
+                                <FormInput
                                     control={form.control}
                                     name="lastName"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-sm font-medium">Last Name</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    type="text"
-                                                    placeholder="Doe"
-                                                    className="h-10 border-border/50 focus:border-primary transition-colors"
-                                                    disabled={registerMutation.isPending}
-                                                />
-                                            </FormControl>
-                                            <FormMessage className="text-xs" />
-                                        </FormItem>
-                                    )}
+                                    label="Last Name"
+                                    type="text"
+                                    placeholder="Doe"
+                                    className="h-10 border-border/50 focus:border-primary transition-colors"
+                                    disabled={registerMutation.isPending}
+                                    leftIcon={<User className="w-4 h-4 text-muted-foreground" />}
                                 />
                             </div>
 
-                            <FormField
+                            <FormSelect
                                 control={form.control}
                                 name="gender"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-sm font-medium">Gender</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger className="h-10 border-border/50 focus:border-primary transition-colors">
-                                                    <SelectValue placeholder="Select gender" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="Male">Male</SelectItem>
-                                                <SelectItem value="Female">Female</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage className="text-xs" />
-                                    </FormItem>
-                                )}
+                                label="Gender"
+                                options={[
+                                    { label: 'Male', value: 'Male' },
+                                    { label: 'Female', value: 'Female' }
+                                ]}
+                                disabled={registerMutation.isPending}
                             />
 
-                            <FormField
+                            <FormInput
                                 control={form.control}
                                 name="username"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-sm font-medium">Username</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                                <Input
-                                                    {...field}
-                                                    type="text"
-                                                    placeholder="Enter username"
-                                                    className="pl-10 h-10 border-border/50 focus:border-primary transition-colors"
-                                                    disabled={registerMutation.isPending}
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage className="text-xs" />
-                                    </FormItem>
-                                )}
+                                label="Username"
+                                type="text"
+                                placeholder="Enter username"
+                                className="h-10 border-border/50 focus:border-primary transition-colors"
+                                disabled={registerMutation.isPending}
+                                leftIcon={<User className="w-4 h-4" />}
                             />
 
-                            <FormField
+                            <FormInput
                                 control={form.control}
                                 name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-sm font-medium">Password</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                                <Input
-                                                    {...field}
-                                                    type={showPassword ? 'text' : 'password'}
-                                                    placeholder="Enter password"
-                                                    className="pl-10 pr-10 h-10 border-border/50 focus:border-primary transition-colors"
-                                                    disabled={registerMutation.isPending}
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                    disabled={registerMutation.isPending}
-                                                >
-                                                    {showPassword ? (
-                                                        <EyeOff className="w-4 h-4 text-muted-foreground" />
-                                                    ) : (
-                                                        <Eye className="w-4 h-4 text-muted-foreground" />
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage className="text-xs" />
-                                    </FormItem>
-                                )}
+                                label="Password"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Enter password"
+                                className="h-10 border-border/50 focus:border-primary transition-colors"
+                                disabled={registerMutation.isPending}
+                                leftIcon={<Lock className="w-4 h-4" />}
+                                rightIcon={
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-auto p-0 hover:bg-transparent"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        disabled={registerMutation.isPending}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="w-4 h-4 text-muted-foreground" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-muted-foreground" />
+                                        )}
+                                    </Button>
+                                }
                             />
 
-                            <FormField
+                            <FormInput
                                 control={form.control}
                                 name="confirmPassword"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-sm font-medium">Confirm Password</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                                <Input
-                                                    {...field}
-                                                    type={showConfirmPassword ? 'text' : 'password'}
-                                                    placeholder="Confirm password"
-                                                    className="pl-10 pr-10 h-10 border-border/50 focus:border-primary transition-colors"
-                                                    disabled={registerMutation.isPending}
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                    disabled={registerMutation.isPending}
-                                                >
-                                                    {showConfirmPassword ? (
-                                                        <EyeOff className="w-4 h-4 text-muted-foreground" />
-                                                    ) : (
-                                                        <Eye className="w-4 h-4 text-muted-foreground" />
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage className="text-xs" />
-                                    </FormItem>
-                                )}
+                                label="Confirm Password"
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                placeholder="Confirm password"
+                                className="h-10 border-border/50 focus:border-primary transition-colors"
+                                disabled={registerMutation.isPending}
+                                leftIcon={<Lock className="w-4 h-4" />}
+                                rightIcon={
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-auto p-0 hover:bg-transparent"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        disabled={registerMutation.isPending}
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff className="w-4 h-4 text-muted-foreground" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-muted-foreground" />
+                                        )}
+                                    </Button>
+                                }
                             />
 
                             <div className="space-y-4 mt-6">
@@ -247,6 +191,7 @@ export function RegisterForm({ onBackToLogin }: RegisterFormProps) {
                             </div>
                         </form>
                     </Form>
+
                 </CardContent>
             </Card>
         </div>

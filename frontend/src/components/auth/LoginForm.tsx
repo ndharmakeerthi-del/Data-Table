@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormInput } from '../customUi/formInput';
 
 interface LoginFormProps {
     onSwitchToRegister?: () => void;
@@ -48,66 +49,45 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
 
                 <CardContent className="space-y-6">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <div className='mb-10'>
-                                <FormField
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+                            <div className='space-y-10'>
+                                
+                                <FormInput
                                     control={form.control}
-                                    name="username"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-lg font-bold">Username</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                                    <Input
-                                                        {...field}
-                                                        type="text"
-                                                        placeholder="Enter your username"
-                                                        className="pl-10 h-11 border-border/50 focus:border-primary transition-colors"
-                                                        disabled={loginMutation.isPending}
-                                                    />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage className="text-xs" />
-                                        </FormItem>
-                                    )}
+                                    name='username'
+                                    label='Username'
+                                    type='text'
+                                    placeholder='Enter your username'
+                                    className='h-11 border-border/50 focus:border-primary transition-colors'
+                                    disabled={loginMutation.isPending}
+                                    leftIcon={<User className='w-4 h-4' />}
                                 />
 
-                                <FormField
+                                <FormInput
                                     control={form.control}
                                     name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-lg font-bold">Password</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                                                    <Input
-                                                        {...field}
-                                                        type={showPassword ? 'text' : 'password'}
-                                                        placeholder="Enter your password"
-                                                        className="pl-10 pr-10 h-11 border-border/50 focus:border-primary transition-colors"
-                                                        disabled={loginMutation.isPending}
-                                                    />
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                                        onClick={() => setShowPassword(!showPassword)}
-                                                        disabled={loginMutation.isPending}
-                                                    >
-                                                        {showPassword ? (
-                                                            <EyeOff className="w-4 h-4 text-muted-foreground" />
-                                                        ) : (
-                                                            <Eye className="w-4 h-4 text-muted-foreground" />
-                                                        )}
-                                                    </Button>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage className="text-xs" />
-                                        </FormItem>
-                                    )}
+                                    label="Password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="Enter password"
+                                    className="h-10 border-border/50 focus:border-primary transition-colors"
+                                    disabled={loginMutation.isPending}
+                                    leftIcon={<Lock className="w-4 h-4" />}
+                                    rightIcon={
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-auto p-0 hover:bg-transparent"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            disabled={loginMutation.isPending}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="w-4 h-4 text-muted-foreground" />
+                                            ) : (
+                                                <Eye className="w-4 h-4 text-muted-foreground" />
+                                            )}
+                                        </Button>
+                                    }
                                 />
                             </div>
                             <Button

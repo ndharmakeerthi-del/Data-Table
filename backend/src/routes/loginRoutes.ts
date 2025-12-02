@@ -174,28 +174,28 @@ router.post(
             await admin.save();
 
             // Create JWT token and set cookie
-            const token = signAuthToken({
-                sub: String(admin._id),
-                id: admin.id,
-                username: admin.username,
-                role: admin.role,
-            });
+            // const token = signAuthToken({
+            //     sub: String(admin._id),
+            //     id: admin.id,
+            //     username: admin.username,
+            //     role: admin.role,
+            // });
 
-            setAuthCookie(res, token);
+            // setAuthCookie(res, token);
 
-            return res.status(201).json({
-                success: true,
-                message: "Registration successful",
-                admin: {
-                    _id: admin._id,
-                    id: admin.id,
-                    firstName: admin.firstName,
-                    lastName: admin.lastName,
-                    gender: admin.gender,
-                    username: admin.username,
-                    role: admin.role,
-                },
-            });
+            // return res.status(201).json({
+            //     success: true,
+            //     message: "Registration successful",
+            //     admin: {
+            //         _id: admin._id,
+            //         id: admin.id,
+            //         firstName: admin.firstName,
+            //         lastName: admin.lastName,
+            //         gender: admin.gender,
+            //         username: admin.username,
+            //         role: admin.role,
+            //     },
+            // });
         } catch (error: any) {
             console.error("Registration error:", error);
             return res.status(500).json({

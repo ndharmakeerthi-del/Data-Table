@@ -5,10 +5,11 @@ import DashboardHome from "./pages/dashboard/home";
 import UserDetailsTable from "./pages/user";
 import ProductsTable from "./pages/product";
 import LocalProductsTable from "./pages/lcoalProduct";
+import ContactPage from "./pages/contact";
 import LoginPage from "./pages/auth/login";
 import RegisterPage from "./pages/auth/register";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { AdminOnlyRoute, UserAndAdminRoute } from "./components/auth/RoleProtectedRoute";
+import { AdminOnlyRoute, UserAndAdminRoute, UserOnlyRoute } from "./components/auth/RoleProtectedRoute";
 import { AuthProvider } from "./components/auth/AuthProvider";
 import { Toaster } from "sonner";
 
@@ -51,6 +52,14 @@ function App() {
                           <AdminOnlyRoute>
                             <UserDetailsTable />
                           </AdminOnlyRoute>
+                        } 
+                      />
+                      <Route 
+                        path={ROUTES.CONTACT} 
+                        element={
+                          <UserOnlyRoute>
+                            <ContactPage />
+                          </UserOnlyRoute>
                         } 
                       />
                     </Routes>

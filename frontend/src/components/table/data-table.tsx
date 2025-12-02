@@ -15,12 +15,9 @@ import { DataTableFilter } from "./data-table-filter"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data?: TData[]
-    /** Optional column id for text filter */
     filterColumn?: string
-    /** Optional dropdown filter configuration */
     dropdownColumn?: string
     dropdownOptions?: string[]
-    /** Optional callbacks for CRUD actions */
     onAdd?: () => void
     onEdit?: (row: TData) => void
     onDelete?: (row: TData) => void

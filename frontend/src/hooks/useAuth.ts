@@ -68,7 +68,7 @@ export const useRegister = () => {
                     duration: 3000,
                 });
                 // Navigate to dashboard after successful registration
-                navigate('/dashboard', { replace: true });
+                navigate('/login', { replace: true }); // 
             } else {
                 setError(data.message);
                 toast.error('Registration failed', {

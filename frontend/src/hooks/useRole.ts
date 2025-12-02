@@ -1,7 +1,5 @@
 import { useAuthStore } from "@/store/authStore"
 
-
-
 export const useRole = () => {
     const { admin } = useAuthStore();
 
@@ -20,7 +18,6 @@ export const useRole = () => {
     };
 };
 
-
 export const usePermissions = () => {
     const { isAdmin, isUser } = useRole();
     
@@ -33,5 +30,29 @@ export const usePermissions = () => {
         canDeleteProducts: isAdmin,
         canAccessAdminPanel: isAdmin,
         canAccessDashboard: isAdmin || isUser,
+        canAccessContact: isAdmin || isUser, // Added contact permission
+        canManageContacts: isAdmin, // Admin-only contact management
+        canViewContactStats: isAdmin,
+    };
+};
+
+export const useNavigation = () => {
+    const { role, hasAnyRole } = useRole();
+    
+    const getVisibleRoutes = () => {
+        const routes = [
+            { path: '/', label: 'Dashboard', roles: ['user', 'admin'] },
+            { path: '/products', label: 'Products', roles: ['user', 'admin'] },
+            { path: '/local-products', label: 'Local Products', roles: ['user', 'admin'] },
+            { path: '/user', label: 'Users', roles: ['admin'] },
+            { path: '/contact', label: 'Contact', roles: ['user', 'admin'] },
+        ];
+        
+        return routes.filter(route => hasAnyRole(route.roles));
+    };
+    
+    return {
+        visibleRoutes: getVisibleRoutes(),
+        role,
     };
 };

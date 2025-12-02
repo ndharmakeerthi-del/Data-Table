@@ -54,3 +54,9 @@ export const UserAndAdminRoute = ({ children }: { children: ReactNode }) => (
         {children}
     </RoleProtectedRoute>
 );
+
+export const UserOnlyRoute = ({ children } : { children: ReactNode }) => (
+    <RoleProtectedRoute allowedRoles={['user']}>
+        {children}
+    </RoleProtectedRoute>
+);

@@ -1,6 +1,6 @@
 import NavBar from "@/components/navbar/NavBar";
 import { ThemeProvider } from "@/components/providers/theme-provide";
-import { Home, User2, Archive, ArchiveX } from "lucide-react";
+import { Home, User2, Archive, ArchiveX, MessageCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { AdminOnly, UserAccess } from "@/components/auth/RoleGuard";
@@ -11,6 +11,7 @@ const navigation = [
     { name: 'Users', href: '/user', icon: User2, requiredRoles: ['admin'] },
     { name: 'Products', href: '/products', icon: Archive, requiredRoles: ['user', 'admin'] },
     { name: 'Local Products', href: '/local-products', icon: ArchiveX, requiredRoles: ['user', 'admin'] },
+    { name: 'Contact', href: '/contact', icon: MessageCircle, requiredRoles: ['user'] },
 ]
 
 export default function Dashboard({ children }: { children: React.ReactNode }) {

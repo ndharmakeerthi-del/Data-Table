@@ -31,6 +31,12 @@ interface EnvironmentConfig {
   CLOUDINARY_API_KEY: string;
   CLOUDINARY_API_SECRET: string;
   CLOUDINARY_UPLOAD_PRESET: string;
+
+  // EmailJS
+  EMAILJS_SERVICE_ID: string;
+  EMAILJS_TEMPLATE_ID: string;
+  EMAILJS_USER_KEY: string;
+  EMAILJS_ADMIN_EMAIL: string;
 }
 
 const getEnvVar = (key: string, defaultValue?: string): string => {
@@ -86,6 +92,12 @@ export const env: EnvironmentConfig = {
   CLOUDINARY_API_KEY: getEnvVar('VITE_CLOUDINARY_API_KEY', ''),
   CLOUDINARY_API_SECRET: getEnvVar('VITE_CLOUDINARY_API_SECRET', ''),
   CLOUDINARY_UPLOAD_PRESET: getEnvVar('VITE_CLOUDINARY_UPLOAD_PRESET', ''),
+
+  // EmailJS
+  EMAILJS_SERVICE_ID: getEnvVar('VITE_EMAILJS_SERVICE_ID', 'service_rfumt7n'),
+  EMAILJS_TEMPLATE_ID: getEnvVar('VITE_EMAILJS_TEMPLATE_ID', ''),
+  EMAILJS_USER_KEY: getEnvVar('VITE_EMAILJS_KEY', ''),
+  EMAILJS_ADMIN_EMAIL: getEnvVar('VITE_EMAILJS_ADMIN_EMAIL', ''),
 };
 
 export default env;

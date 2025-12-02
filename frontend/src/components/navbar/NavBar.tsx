@@ -22,7 +22,7 @@ const NavBar = ({ onToggleSidebar }: NavBarProps) => {
     const { setTheme } = useTheme();
     const { admin } = useAuthStore();
     const logoutMutation = useLogout();
-
+    
     const handleLogout = () => {
         logoutMutation.mutate();
     };
@@ -103,8 +103,8 @@ const NavBar = ({ onToggleSidebar }: NavBarProps) => {
                             <Settings className="h-[1.2rem] w-[1.2rem] mr-2" />
                             Settings
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                            className="text-red-500 focus:text-red-500" 
+                        <DropdownMenuItem
+                            className="text-red-500 focus:text-red-500"
                             onClick={handleLogout}
                             disabled={logoutMutation.isPending}
                         >
