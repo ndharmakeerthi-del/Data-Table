@@ -10,7 +10,7 @@ export const useUsersPaginated = (
     return useQuery({
         queryKey: ['users', 'paginated', page, limit, search],
         queryFn: () => getUsersPaginated(page, limit, search),
-        placeholderData: keepPreviousData, // Important for smooth pagination
+        placeholderData: keepPreviousData,
         staleTime: 5 * 60 * 1000, // 5 minutes
     });
 };

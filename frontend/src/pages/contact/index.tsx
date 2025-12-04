@@ -1,22 +1,10 @@
 import { useState } from "react";
 import { CustomCard } from "@/components/customUi/customCard";
 import { ContactForm } from "@/components/form/ContactForm";
-import { Button } from "@/components/ui/button";
-import {
-    Mail,
-    Phone,
-    MapPin,
-    Clock,
-    MessageCircle,
-    CheckCircle2,
-    ArrowLeft
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { CheckCircle2 } from "lucide-react";
 
 export default function ContactPage() {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const navigate = useNavigate();
 
     const handleFormSuccess = () => {
         setShowSuccessMessage(true);
@@ -30,52 +18,6 @@ export default function ContactPage() {
         console.error("Contact form error:", error);
         // Error is already handled by toast in ContactForm
     };
-
-    const contactInfo = [
-        {
-            icon: Mail,
-            title: "Email",
-            content: "support@datatable.com",
-            description: "Send us an email anytime"
-        },
-        {
-            icon: Phone,
-            title: "Phone",
-            content: "+1 (555) 123-4567",
-            description: "Mon-Fri from 8am to 6pm"
-        },
-        {
-            icon: MapPin,
-            title: "Office",
-            content: "123 Business St, Suite 100",
-            description: "New York, NY 10001"
-        },
-        {
-            icon: Clock,
-            title: "Business Hours",
-            content: "Monday - Friday",
-            description: "8:00 AM - 6:00 PM EST"
-        }
-    ];
-
-    const faqs = [
-        {
-            question: "How quickly will I receive a response?",
-            answer: "We typically respond to all inquiries within 24-48 hours during business days."
-        },
-        {
-            question: "What information should I include in my message?",
-            answer: "Please provide as much detail as possible about your inquiry, including any relevant account information or error messages."
-        },
-        {
-            question: "Can I call instead of using the contact form?",
-            answer: "Yes! You can call us during business hours. However, using the contact form helps us track and prioritize your request."
-        },
-        {
-            question: "Do you provide technical support?",
-            answer: "Yes, we provide comprehensive technical support for all features of our platform."
-        }
-    ];
 
     return (
         <div className="min-h-screen bg-background">

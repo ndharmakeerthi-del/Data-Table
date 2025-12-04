@@ -39,7 +39,7 @@ export function AddLocalProductForm({ open, onOpenChange, product }: AddProductF
                 rating: values.rating,
                 stock: values.stock,
                 brand: values.brand,
-                image: values.image || "" // Include image
+                image: values.image || ""
             };
 
             createProductMutation.mutate(newProductData, {

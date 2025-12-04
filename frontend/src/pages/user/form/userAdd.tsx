@@ -22,60 +22,6 @@ export function AddUserForm({ open, onOpenChange, user }: AddUserFormProps) {
     const createUserMutation = useCreateUser();
     const updateUserMutation = useUpdateUser();
 
-    // async function handleSubmit(values: AddUserFormData) {
-    //     if (!user) {
-    //         // Creating new user
-    //         const birthDateStr =
-    //             typeof values.birthDate === "string"
-    //                 ? values.birthDate
-    //                 : values.birthDate instanceof Date
-    //                     ? values.birthDate.toISOString().split("T")[0]
-    //                     : String(values.birthDate);
-
-    //         const newUserData = {
-    //             firstName: values.firstName,
-    //             lastName: values.lastName,
-    //             gender: values.gender as "Male" | "Female",
-    //             email: values.email,
-    //             birthDate: birthDateStr,
-    //         };
-
-    //         createUserMutation.mutate(newUserData, {
-    //             onSuccess: () => {
-    //                 onOpenChange(false);
-    //             }
-    //         });
-    //     }
-
-    //     else {
-    //         // Updating existing user
-    //         const birthDateStr =
-    //             typeof values.birthDate === "string"
-    //                 ? values.birthDate
-    //                 : values.birthDate instanceof Date
-    //                     ? values.birthDate.toISOString().split("T")[0]
-    //                     : String(values.birthDate);
-
-    //         const updatedUserData = {
-    //             firstName: values.firstName,
-    //             lastName: values.lastName,
-    //             gender: values.gender as "Male" | "Female",
-    //             email: values.email,
-    //             birthDate: birthDateStr,
-
-    //         };
-
-    //         updateUserMutation.mutate(
-    //             { id: user.id, user: updatedUserData },
-    //             {
-    //                 onSuccess: () => {
-    //                     onOpenChange(false);
-    //                 }
-    //             }
-    //         );
-    //     }
-    // }
-
     async function handleSubmit(values: AddUserFormData, file?: File) {
         const birthDateStr = typeof values.birthDate === 'string'
             ? values.birthDate

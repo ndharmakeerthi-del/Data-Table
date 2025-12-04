@@ -1,17 +1,33 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
-import { Upload, X, ImageIcon, Loader2 } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
+import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 
 interface S3ImageUploadProps {
-    value?: string;
-    onChange: (file: File | null, preview?: string) => void;
+    value?: string | File; // ✅ Match ImageUpload interface
+    onChange: (file: File | string) => void; // ✅ Match ImageUpload interface
     onError?: (error: string) => void;
     disabled?: boolean;
     className?: string;
 }
+
+// File validation function
+const validateFile = (file: File): { valid: boolean; error?: string } => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+        return { valid: false, error: 'Please upload a valid image file (JPEG, PNG, WebP)' };
+    }
+    
+    if (file.size > maxSize) {
+        return { valid: false, error: 'File size must be less than 5MB' };
+    }
+    
+    return { valid: true };
+};
 
 export function S3ImageUpload({
     value,
@@ -20,224 +36,209 @@ export function S3ImageUpload({
     disabled = false,
     className = "",
 }: S3ImageUploadProps) {
-    const [preview, setPreview] = useState<string>(value || "");
+    const [preview, setPreview] = useState<string>(() => {
+        if (typeof value === 'string') return value;
+        if (value instanceof File) return URL.createObjectURL(value);
+        return "";
+    });
     const [isDragging, setIsDragging] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-
-    // Validate file
-    const validateFile = (file: File): { valid: boolean; error?: string } => {
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        const maxSize = 5 * 1024 * 1024; // 5MB
-
-        if (!allowedTypes.includes(file.type)) {
-            return {
-                valid: false,
-                error: 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.'
-            };
-        }
-
-        if (file.size > maxSize) {
-            return {
-                valid: false,
-                error: 'File size too large. Maximum size is 5MB.'
-            };
-        }
-
-        return { valid: true };
-    };
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Handle file selection
-    const handleFileSelect = useCallback((file: File) => {
-        setIsLoading(true);
-
-        // Validate file
+    const handleFileSelect = useCallback(async (file: File) => {
+        // Validate file first
         const validation = validateFile(file);
         if (!validation.valid) {
-            const errorMsg = validation.error || 'Invalid file';
-            toast.error(errorMsg);
-            onError?.(errorMsg);
-            setIsLoading(false);
+            onError?.(validation.error || 'Invalid file');
             return;
         }
 
-        // Create preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const previewUrl = e.target?.result as string;
-            setPreview(previewUrl);
-            onChange(file, previewUrl);
+        setIsLoading(true);
+        
+        try {
+            // Create preview immediately
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewUrl = e.target?.result as string;
+                setPreview(previewUrl);
+            };
+            reader.readAsDataURL(file);
+
+            // Pass file to parent for delayed upload
+            onChange(file);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to process file';
+            onError?.(errorMessage);
+        } finally {
             setIsLoading(false);
-        };
-        reader.onerror = () => {
-            const errorMsg = 'Failed to read file';
-            toast.error(errorMsg);
-            onError?.(errorMsg);
-            setIsLoading(false);
-        };
-        reader.readAsDataURL(file);
+        }
     }, [onChange, onError]);
 
     // Handle file input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            handleFileSelect(file);
+        const files = Array.from(e.target.files || []);
+        if (files.length > 0) {
+            handleFileSelect(files[0]);
         }
     };
 
     // Handle drag and drop
-    const handleDrop = useCallback((e: React.DragEvent) => {
+    const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
 
-        if (disabled) return;
+        if (disabled || isLoading) return;
 
-        const files = e.dataTransfer.files;
-        if (files?.[0]) {
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) {
             handleFileSelect(files[0]);
         }
-    }, [disabled, handleFileSelect]);
+    }, [disabled, isLoading, handleFileSelect]);
 
-    const handleDragOver = useCallback((e: React.DragEvent) => {
+    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        if (!disabled) {
+        if (!disabled && !isLoading) {
             setIsDragging(true);
         }
-    }, [disabled]);
+    }, [disabled, isLoading]);
 
-    const handleDragLeave = useCallback((e: React.DragEvent) => {
+    const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
     }, []);
 
-    // Remove image
-    const handleRemove = () => {
-        setPreview("");
-        onChange(null);
-        
-        // Reset input
-        const input = document.getElementById('s3-image-input') as HTMLInputElement;
-        if (input) {
-            input.value = '';
+    const handleRemove = useCallback(() => {
+        if (preview && preview.startsWith('blob:')) {
+            URL.revokeObjectURL(preview);
         }
-    };
+        setPreview("");
+        onChange("");
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    }, [onChange, preview]);
+
+    const handleBrowse = useCallback(() => {
+        if (!disabled && !isLoading) {
+            fileInputRef.current?.click();
+        }
+    }, [disabled, isLoading]);
+
+    const isPendingFile = value instanceof File;
 
     return (
-        <div className={`w-full ${className}`}>
-            {preview ? (
-                // Preview mode
-                <div className="relative group">
-                    <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-gray-200">
+        <div className={cn('space-y-4', className)}>
+            {/* Upload Area */}
+            <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                className={cn(
+                    'relative border-2 border-dashed rounded-lg p-6 transition-colors',
+                    isDragging && !disabled
+                        ? 'border-primary bg-primary/5'
+                        : 'border-gray-300 hover:border-gray-400',
+                    disabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+                    !preview ? 'min-h-[200px]' : 'min-h-[100px]'
+                )}
+                onClick={!preview ? handleBrowse : undefined}
+            >
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleInputChange}
+                    className="hidden"
+                    disabled={disabled || isLoading}
+                />
+
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center text-center">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+                        <p className="text-sm text-muted-foreground">Processing image...</p>
+                    </div>
+                ) : preview ? (
+                    <div className="flex items-center space-x-4">
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+                            <img
+                                src={preview}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                                {isPendingFile ? 'Image selected (will upload to S3 on save)' : 'Image ready'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                {isPendingFile ? 'Pending S3 upload' : 'Click to replace or remove'}
+                            </p>
+                        </div>
+                        <div className="flex space-x-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleBrowse}
+                                disabled={disabled || isLoading}
+                            >
+                                Replace
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRemove}
+                                disabled={disabled || isLoading}
+                                className="text-destructive hover:text-destructive"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center">
+                        <div className="mx-auto w-12 h-12 text-gray-400 mb-4">
+                            {isDragging ? <Upload className="w-full h-full" /> : <ImageIcon className="w-full h-full" />}
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-sm font-medium">
+                                {isDragging ? 'Drop your image here' : 'Upload to S3'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                Drag and drop or{' '}
+                                <span className="text-primary font-medium">browse files</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                Supports: JPEG, PNG, WebP (Max: 5MB)
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Preview Image */}
+            {preview && (
+                <div className="relative">
+                    <div className="aspect-video w-full max-w-md mx-auto rounded-lg overflow-hidden bg-gray-100">
                         <img
                             src={preview}
                             alt="Preview"
                             className="w-full h-full object-cover"
                         />
-                        {isLoading && (
-                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                <Loader2 className="h-8 w-8 text-white animate-spin" />
+                        {isPendingFile && (
+                            <div className="absolute top-2 right-2">
+                                <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
+                                    Pending S3 Upload
+                                </span>
                             </div>
                         )}
                     </div>
-                    
-                    {!disabled && (
-                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                onClick={handleRemove}
-                                className="h-8 w-8 p-0"
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    )}
-
-                    {!disabled && (
-                        <div className="mt-2">
-                            <label htmlFor="s3-image-input" className="cursor-pointer">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={isLoading}
-                                    asChild
-                                >
-                                    <span>
-                                        {isLoading ? (
-                                            <>
-                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                Processing...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Upload className="h-4 w-4 mr-2" />
-                                                Change Image
-                                            </>
-                                        )}
-                                    </span>
-                                </Button>
-                            </label>
-                            <input
-                                id="s3-image-input"
-                                type="file"
-                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                onChange={handleInputChange}
-                                disabled={disabled || isLoading}
-                                className="hidden"
-                            />
-                        </div>
-                    )}
-                </div>
-            ) : (
-                // Upload area
-                <div
-                    className={`
-                        relative w-full h-48 border-2 border-dashed rounded-lg
-                        flex flex-col items-center justify-center p-6 transition-colors
-                        ${isDragging 
-                            ? 'border-primary bg-primary/5' 
-                            : 'border-gray-300 hover:border-gray-400'
-                        }
-                        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                    `}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onClick={() => {
-                        if (!disabled) {
-                            document.getElementById('s3-image-input')?.click();
-                        }
-                    }}
-                >
-                    {isLoading ? (
-                        <div className="flex flex-col items-center">
-                            <Loader2 className="h-12 w-12 text-gray-400 animate-spin mb-3" />
-                            <p className="text-sm text-gray-600">Processing image...</p>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center">
-                            <ImageIcon className="h-12 w-12 text-gray-400 mb-3" />
-                            <p className="text-sm text-gray-600 text-center mb-1">
-                                Click to upload or drag and drop
-                            </p>
-                            <p className="text-xs text-gray-500 text-center">
-                                JPEG, PNG, WebP up to 5MB
-                            </p>
-                        </div>
-                    )}
-
-                    <input
-                        id="s3-image-input"
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/webp"
-                        onChange={handleInputChange}
-                        disabled={disabled || isLoading}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                    />
                 </div>
             )}
         </div>
     );
 }
+
+export default S3ImageUpload;

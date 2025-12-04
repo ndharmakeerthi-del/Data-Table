@@ -61,9 +61,9 @@ export const useRegister = () => {
         },
         onSuccess: (data) => {
             if (data.success) {
-                setAdmin(data.admin);
+                setAdmin(data.user);
                 toast.success('Registration successful!', {
-                    description: `Welcome, ${data.admin.firstName}! You are now logged in.`,
+                    description: `Welcome, ${data.user.firstName}! You are now logged in.`,
                     position: 'top-center',
                     duration: 3000,
                 });

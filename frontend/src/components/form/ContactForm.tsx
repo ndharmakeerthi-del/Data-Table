@@ -12,6 +12,7 @@ import { Mail, MessageCircle, Send, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { FormInput } from "../customUi/formInput";
 import { FormTextArea } from "../customUi/formTextArea";
+import env from "@/config/env";
 
 
 
@@ -48,18 +49,18 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess, onError, cl
                 throw new Error(`Email configuration error: ${validation.error.join(", ")}`);
             }
 
-            await EmailService.sendContactForm(values);
-
-            const adminContact = EmailService.getAdminContact();
-            await EmailService.sendAdminReply({
-                adminName: adminContact.name,
-                adminEmail: adminContact.email,
-                recipientName: values.senderName,
-                recipientEmail: values.senderEmail,
+            const templateData = {
+                from_name: values.senderName,
+                from_email: values.senderEmail,
+                to_email: env.EMAILJS_ADMIN_EMAIL,
                 subject: values.subject,
-                message: `Thank you for contacting us, ${values.senderName}!\n\nWe have received your message and will get back to you within 24-48 hours.\n\nBest regards,\nThe Support Team`,
-                originalMessage: values.message,
-            });
+                message: values.message,
+                reply_to: values.senderEmail,
+                app_name: env.APP_NAME,
+                timeStamp: new Date().toLocaleString(),
+            }
+            
+            await EmailService.sendTemplate(env.EMAILJS_TEMPLATE_ID!, templateData);
 
             toast.success("Message sent successfully! YOU will receive a confirmation email shortly.");
             form.reset();

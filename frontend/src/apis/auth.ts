@@ -18,7 +18,7 @@ export interface LoginResponse {
 export interface RegisterResponse {
     success: boolean;
     message: string;
-    admin: {
+    user: {  // Changed from 'admin' to 'user' to match backend response
         _id: string;
         id: number;
         firstName: string;
@@ -27,6 +27,7 @@ export interface RegisterResponse {
         username: string;
         role: 'admin' | 'user';
     };
+    emailSent: boolean;
 }
 
 export interface LoginRequest {
@@ -42,9 +43,9 @@ export const authAPI = {
         return response.data;
     },
 
-    // Register
+    // Register - FIX: Change from '/auth/register' to '/register'
     register: async (data: RegisterFormData): Promise<RegisterResponse> => {
-        const response = await usersApi.post('/auth/register', data);
+        const response = await usersApi.post('/register', data);
         return response.data;
     },
 

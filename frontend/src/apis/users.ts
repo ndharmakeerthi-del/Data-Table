@@ -1,17 +1,7 @@
 
 
-// import axios from "axios"
-// import { env } from "@/config/env"
 import { usersApi } from "./client";
 
-// API client for backend  
-// const backendApi = axios.create({
-//     baseURL: env.BACKEND_API_BASE_URL || "http://localhost:3000/api",
-//     timeout: env.API_TIMEOUT,
-//     headers: {
-//         "Content-Type": "application/json",
-//     }
-// })
 
 export interface User {
     id: number;
@@ -21,8 +11,6 @@ export interface User {
     email: string;
     birthDate: string;
     profileImage?: string;
-    // _id?: string; // MongoDB ID
-    // __v?: number; // MongoDB version
 }
 
 

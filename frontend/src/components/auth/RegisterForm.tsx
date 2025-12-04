@@ -1,7 +1,7 @@
-import { useState } from 'react';
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, UserPlus, User, Lock } from 'lucide-react';
+import {  UserPlus, User } from 'lucide-react';
 import { RegisterSchema, RegisterFormData } from '@/schemas';
 import { useRegister } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -15,8 +15,6 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ onBackToLogin }: RegisterFormProps) {
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const registerMutation = useRegister();
 
     const form = useForm<RegisterFormData>({
@@ -26,8 +24,6 @@ export function RegisterForm({ onBackToLogin }: RegisterFormProps) {
             lastName: '',
             gender: undefined,
             username: '',
-            password: '',
-            confirmPassword: '',
         },
     });
 
@@ -99,14 +95,14 @@ export function RegisterForm({ onBackToLogin }: RegisterFormProps) {
                                 control={form.control}
                                 name="username"
                                 label="Username"
-                                type="text"
+                                type="email"
                                 placeholder="Enter username"
                                 className="h-10 border-border/50 focus:border-primary transition-colors"
                                 disabled={registerMutation.isPending}
                                 leftIcon={<User className="w-4 h-4" />}
                             />
 
-                            <FormInput
+                            {/* <FormInput
                                 control={form.control}
                                 name="password"
                                 label="Password"
@@ -158,7 +154,7 @@ export function RegisterForm({ onBackToLogin }: RegisterFormProps) {
                                         )}
                                     </Button>
                                 }
-                            />
+                            /> */}
 
                             <div className="space-y-4 mt-6">
                                 <Button

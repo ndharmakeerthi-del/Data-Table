@@ -28,12 +28,7 @@ export const RegisterSchema = z.object({
     firstName: z.string().min(1, { message: "First name is required" }).max(50),
     lastName: z.string().min(1, { message: "Last name is required" }).max(50),
     gender: z.enum(["Male", "Female"], { message: "Please select a gender" }),
-    username: z.string().min(3, { message: "Username must be at least 3 characters" }).max(30),
-    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-    confirmPassword: z.string().min(1, { message: "Please confirm your password" }),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
+    username: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email address" }),
 });
 
 
@@ -53,7 +48,7 @@ export const AddLocalProductSchema = z.object({
     rating: z.number({ message: 'Rating must be a number' })
         .min(0, { message: 'Rating must be at least 0' })
         .max(5, { message: 'Rating cannot exceed 5' }),
-    image: z.string().url({ message: 'Image must be a valid URL' }).optional().or(z.literal("")),
+    image: z.string().optional().or(z.literal("")),
 })
 
 export const ContactFormSchema = z.object({
